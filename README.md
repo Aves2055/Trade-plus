@@ -1,6 +1,6 @@
 # TradePulse
 
-A simple personal trading journal. Log trades with charges, mark no-trade days and holidays, track your loss limit, daily target and recovery, and see a fresh reminder every day.
+A simple personal trading journal. The home page shows your account balance, previous loss recovery, a fresh daily reminder and one quick form to log a trade (with charges), a no-trade day or a holiday. Your history and calendar are on a separate History tab.
 
 Everything runs in the browser. Your data is stored in your own browser (localStorage) and never leaves your device.
 

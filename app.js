@@ -1,9 +1,6 @@
-var K='tradepulse_v1',MIS=['FOMO / Chased Entry','Moved / No Stop-Loss','Revenge Trade','Overtraded','Oversized Position'],GOOD=['Waited for Confirmation','Followed Plan','Respected Stop-Loss'];
+var K='tradepulse_v2',MIS=['FOMO / Chased Entry','Moved / No Stop-Loss','Revenge Trade','Overtraded','Oversized Position'],GOOD=['Waited for Confirmation','Followed Plan','Respected Stop-Loss'];
 var S=null;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
-if(!S||!Array.isArray(S.trades))S={pastLoss:18500,dailyLossLimit:3500,dailyTarget:0,startBalance:0,customPills:[],trades:[
-{id:'demo_1',date:'2026-11-15',session:'Morning',ticker:'NIFTY 50',outcome:'LOSS',pnl:-3200,tags:['FOMO / Chased Entry','Moved / No Stop-Loss'],reflection:'Entered late after a sharp breakout candle without waiting for pullback, then widened stop-loss instead of cutting early.',createdAt:1794933208888},
-{id:'demo_2',date:'2026-11-16',session:'Afternoon',ticker:'BANKNIFTY',outcome:'PROFIT',pnl:5400,tags:[],reflection:'Waited for structure confirmation and respected my pre-planned target.',createdAt:1794933308888},
-{id:'demo_3',date:'2026-11-17',session:'Expiry',ticker:'CRUDE OIL',outcome:'PROFIT',pnl:4100,tags:[],reflection:'Closed the terminal after hitting daily target instead of overtrading.',createdAt:1794933408888}]};
+if(!S||!Array.isArray(S.trades))S={pastLoss:0,startBalance:0,customPills:[],days:{},trades:[]};
 S.startBalance=+S.startBalance||0;S.days=S.days&&typeof S.days==='object'?S.days:{};S.customPills=Array.isArray(S.customPills)?S.customPills:[];
 var sel=[],oc='PROFIT',md='TRADE',cm=new Date();cm.setDate(1);
 function $(i){return document.getElementById(i)}
@@ -18,7 +15,7 @@ function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
 function all(){return MIS.concat(GOOD,S.customPills)}
 function eff(){return document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
 function th(){var n=eff()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('tp_theme',n)}catch(e){}$('tb').textContent=n==='dark'?'☀️':'🌙'}
-function fill(){$('sb').value=S.startBalance||'';$('sp').value=S.pastLoss||'';$('sl').value=S.dailyLossLimit||'';$('sg').value=S.dailyTarget||'';$('fd').value=ds(new Date())}
+function fill(){$('sb').value=S.startBalance||'';$('sp').value=S.pastLoss||'';$('fd').value=ds(new Date())}
 function so(o){oc=o;$('bp').className=o==='PROFIT'?'on p':'';$('bl').className=o==='LOSS'?'on l':''}
 function tg(i){var g=all()[i],k=sel.indexOf(g);if(k<0)sel.push(g);else sel.splice(k,1);render()}
 function mv(n){cm.setMonth(cm.getMonth()+n);render()}
@@ -41,46 +38,28 @@ var ok=function(){$('smsg').textContent='Backup copied. Paste it somewhere safe,
 try{navigator.clipboard.writeText(t).then(ok,no)}catch(e){no()}}
 function rst(){var b=$('io');if($('bx').hidden||!b.value.trim()){$('bx').hidden=false;b.value='';b.focus();$('smsg').textContent='Paste your backup above, then press Restore again.';return}
 try{var d=JSON.parse(b.value);if(!d||!Array.isArray(d.trades))throw 0;
-S={pastLoss:+d.pastLoss||0,dailyLossLimit:+d.dailyLossLimit||0,dailyTarget:+d.dailyTarget||0,startBalance:+d.startBalance||0,days:d.days&&typeof d.days==='object'?d.days:{},customPills:Array.isArray(d.customPills)?d.customPills:[],trades:d.trades.map(function(t,i){return{id:String(t.id||'i_'+i+'_'+Date.now()),date:t.date,session:t.session||'Morning',ticker:t.ticker||'',outcome:t.pnl>=0?'PROFIT':'LOSS',gross:t.gross!=null?+t.gross:(+t.pnl||0),charges:+t.charges||0,pnl:+t.pnl||0,tags:t.tags||[],reflection:t.reflection||'',createdAt:t.createdAt||Date.now()}})};
+S={pastLoss:+d.pastLoss||0,startBalance:+d.startBalance||0,days:d.days&&typeof d.days==='object'?d.days:{},customPills:Array.isArray(d.customPills)?d.customPills:[],trades:d.trades.map(function(t,i){return{id:String(t.id||'i_'+i+'_'+Date.now()),date:t.date,session:t.session||'Morning',ticker:t.ticker||'',outcome:t.pnl>=0?'PROFIT':'LOSS',gross:t.gross!=null?+t.gross:(+t.pnl||0),charges:+t.charges||0,pnl:+t.pnl||0,tags:t.tags||[],reflection:t.reflection||'',createdAt:t.createdAt||Date.now()}})};
 save();fill();render();b.value='';$('bx').hidden=true;$('smsg').textContent='Restored.'}catch(e){$('smsg').textContent='That does not look like a TradePulse backup.'}}
 var QUOTES=['Your edge is the plan. Your enemy is the urge to improvise.','A skipped trade costs nothing. A forced trade can cost a week.','Protect your capital first. Profits are what is left when you do.','The market does not owe you a bounce. Cut the loss and move on.','Wins make you careless. Losses make you angry. Stay level in both.','If you have to hurry, you are probably chasing.','Confidence is built by following rules, not by a lucky streak.','Moving a stop-loss is just a bigger bet you never planned.','A revenge trade is paid for twice: once in money, once in confidence.','Small losses are tuition. Big losses are a choice.','Boring and consistent beats exciting and broke.','Today’s goal is not to win. It is to follow your rules.','One good trade does not make you right. One bad trade does not make you wrong.','Be patient at the entry and ruthless at the stop.','Overtrading is fear of missing out wearing a disguise.','Hit your target, close the screen, and keep the day a win.','The best traders are comfortable doing nothing.','Risk a little to learn. Risk a lot and you may never use the lesson.','Every rule you break today becomes tomorrow’s habit.','Size down when you feel sure. Certainty is loudest just before a loss.','Review your mistakes like a coach, not like a critic.','You are not trading to prove yourself right. You are trading to stay in the game.','A calm mind spots the setup. An anxious mind spots the excuse.','Missed a trade? Another will come. Lost your capital? It will not.','Discipline is choosing what you want most over what you want now.','Charges add up quietly. Fewer, better trades keep more of your profit.','Do not trade to get money back. Trade only when the setup is there.','Win streaks need more discipline than losing streaks.','Write the reason before the trade. If you cannot, skip it.','Slow progress with rules beats fast gains with luck.','Rest is part of the strategy. Come back sharp.'];
 function sm(m){md=m;var b=document.querySelectorAll('#mode button'),k=['TRADE','NOTRADE','HOLIDAY'];for(var i=0;i<b.length;i++)b[i].className=k[i]===m?'on':'';$('tf').hidden=m!=='TRADE';$('ab').textContent=m==='TRADE'?'Add trade':'Mark day';$('fr').placeholder=m==='TRADE'?'What happened? What will you do differently?':m==='NOTRADE'?'Why did you stay out? (optional)':'Holiday note (optional)'}
 function delDay(k){delete S.days[k];save();render()}
-function coach(T,td,tn){var L=S.dailyLossLimit,dm=S.days[td],o=T.slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.createdAt-b.createdAt}),l=o[o.length-1],r3=o.slice(-3),m;
-if(L&&tn<=-L)return'Loss limit reached. Close the terminal. Your loss is capped and tomorrow is a fresh start.';
+function coach(T,td,tn){var dm=S.days[td],o=T.slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.createdAt-b.createdAt}),l=o[o.length-1],r3=o.slice(-3),m;
+
 if(dm)return dm.type==='HOLIDAY'?'Market holiday. Rest, review your journal and come back sharp.':'Staying out is a position too. Well done for protecting your capital.';
 if(r3.length===3&&r3.every(function(t){return t.pnl>0}))return'Three wins in a row. This is when overconfidence strikes, so keep your size and your rules exactly the same.';
 if(l&&l.pnl<0){m=(l.tags||[]).filter(function(g){return GOOD.indexOf(g)<0})[0];return m?'Your last loss was tagged “'+m+'”. Do not repeat it today.':'Your last trade was a loss. Do not chase it back; wait for a setup that fits your plan.'}
 return'Plan the trade, then trade the plan. Skip anything you cannot explain in one line.'}
+function vw(v){$('vh').hidden=v!=='H';$('vy').hidden=v==='H';$('t1').className=v==='H'?'on':'';$('t2').className=v==='H'?'':'on';window.scrollTo(0,0)}
 function render(){
 var T=S.trades,td=ds(new Date()),tn=sum(T.filter(function(t){return t.date===td})),tot=sum(T),tcg=T.filter(function(t){return t.date===td}).reduce(function(s,t){return s+(t.charges||0)},0),chg=T.reduce(function(s,t){return s+(t.charges||0)},0);
 $('tb').textContent=eff()==='dark'?'☀️':'🌙';var nw=new Date();$('qt').textContent=QUOTES[Math.floor(Date.UTC(nw.getFullYear(),nw.getMonth(),nw.getDate())/864e5)%QUOTES.length];$('co').textContent=coach(T,td,tn);sm(md);
 $('todayLbl').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
-var L=S.dailyLossLimit,G=S.dailyTarget,P=S.pastLoss,used=Math.max(0,-tn),lp=L?Math.min(100,used/L*100):0,gp=G?Math.min(100,Math.max(0,tn)/G*100):0,rec=Math.max(0,tot),rp_=P?Math.min(100,rec/P*100):0;
+var P=S.pastLoss,rec=Math.max(0,tot),rp_=P?Math.min(100,rec/P*100):0;
 $('bal').textContent=inr(S.startBalance+tot);
 $('bs').textContent=S.startBalance?'Net P&L after charges: '+sg(tot):'Enter your starting balance above to see your account total.';
 $('rb').style.width=rp_+'%';
 $('rt').textContent=P?(rec>=P?'Fully recovered':rp_.toFixed(0)+'% recovered · '+inr(P-rec)+' to go'):'Enter your previous loss above.';
-$('lv').innerHTML=inr(used)+' <small>of '+(L?inr(L):'not set')+'</small>';
-$('lb').style.width=lp+'%';$('lb').style.background=lp>=80?'var(--r)':'var(--ac)';
-$('gv').innerHTML='<span class="'+(tn>0?'g':tn<0?'r':'')+'">'+sg(tn)+'</span> <small>'+(G?'of '+inr(G):'no target')+' · charges '+inr(tcg)+'</small>';
-$('gb').style.width=gp+'%';
-$('banner').innerHTML=L&&tn<=-L?'<div class="ban" style="background:var(--rs);color:var(--r)">Daily loss limit reached. Stop trading for today.</div>':G&&tn>=G?'<div class="ban" style="background:var(--gs);color:var(--g)">Daily target hit. Close the terminal and protect your day.</div>':'';
-var n=T.length,W=T.filter(function(t){return t.pnl>0}),Ls=T.filter(function(t){return t.pnl<0});
-var aw=W.length?sum(W)/W.length:0,al=Ls.length?sum(Ls)/Ls.length:0,tc={},se={},cost=null,best=null,g,s;
-T.forEach(function(t){(t.tags||[]).forEach(function(x){if(GOOD.indexOf(x)<0)tc[x]=(tc[x]||0)+t.pnl});se[t.session]=(se[t.session]||0)+t.pnl});
-for(g in tc)if(tc[g]<0&&(cost===null||tc[g]<tc[cost]))cost=g;
-for(s in se)if(best===null||se[s]>se[best])best=s;
-var gross=T.reduce(function(s,t){return s+(t.gross!=null?t.gross:t.pnl)},0),nt=Object.keys(S.days).filter(function(k){return S.days[k].type==='NOTRADE'}).length,hd=Object.keys(S.days).length-nt;
-$('stats').innerHTML=
-'<div class="tile"><span class="lbl">Win rate (net)</span><b>'+(n?Math.round(W.length/n*100)+'%':'–')+'</b><span class="sub">'+n+' trades</span></div>'+
-'<div class="tile"><span class="lbl">Avg win / loss</span><b>'+(n?'<span class="g">'+inr(aw)+'</span> / <span class="r">'+inr(al)+'</span>':'–')+'</b></div>'+
-'<div class="tile"><span class="lbl">Charges paid</span><b>'+inr(chg)+'</b><span class="sub">'+(gross>0&&chg?Math.round(chg/gross*100)+'% of gross profit':'brokerage and taxes')+'</span></div>'+
-'<div class="tile"><span class="lbl">Costliest mistake</span><b>'+(cost?esc(cost):'None yet')+'</b><span class="sub">'+(cost?sg(tc[cost]):'')+'</span></div>'+
-'<div class="tile"><span class="lbl">Best session</span><b>'+(best?esc(best):'–')+'</b><span class="sub">'+(best?sg(se[best]):'')+'</span></div>'+
-'<div class="tile"><span class="lbl">Days stayed out</span><b>'+nt+'</b><span class="sub">'+hd+' holidays marked</span></div>';
-var gd=T.filter(function(t){return(t.tags||[]).some(function(x){return GOOD.indexOf(x)>=0})}),ot=T.filter(function(t){return gd.indexOf(t)<0});
-$('disc').textContent=gd.length&&ot.length?'Trades with a good-habit tag average '+sg(sum(gd)/gd.length)+' vs '+sg(sum(ot)/ot.length)+' for the rest.':'Tag trades with good habits (like Followed Plan) to see how discipline affects your P&L.';
+
 $('chips').innerHTML=all().map(function(x,i){var c=MIS.indexOf(x)>=0?'m':GOOD.indexOf(x)>=0?'d':'c',xb=c==='c'?'<button type="button" class="x" onclick="rp('+(i-MIS.length-GOOD.length)+')" aria-label="Remove tag">×</button>':'';return'<span class="cw"><button type="button" class="chip '+c+(sel.indexOf(x)>=0?' on':'')+'" onclick="tg('+i+')">'+esc(x)+'</button>'+xb+'</span>'}).join('');
 var y=cm.getFullYear(),m=cm.getMonth(),dim=new Date(y,m+1,0).getDate(),off=(cm.getDay()+6)%7,mp={},mt=0,pre=y+'-'+p2(m+1);
 T.forEach(function(t){mp[t.date]=(mp[t.date]||0)+t.pnl;if(String(t.date).slice(0,7)===pre)mt+=t.pnl});

@@ -7,8 +7,9 @@
 <link rel="stylesheet" href="style.css"></head><body>
 <div class="wrap">
 <header><div><h1>TradePulse</h1><span class="sub" id="todayLbl"></span></div><button class="tbtn" id="tb" onclick="th()" aria-label="Toggle dark mode"></button></header>
-<div id="banner"></div>
 
+<nav class="tabs"><button id="t1" class="on" onclick="vw('H')">Home</button><button id="t2" onclick="vw('Y')">History</button></nav>
+<div id="vh">
 <section class="hero">
 <div>
 <div class="lbl">Account balance</div><div class="bal" id="bal"></div>
@@ -23,13 +24,7 @@
 </section>
 
 <section class="card quote"><div class="lbl">Today’s reminder</div><p id="qt"></p><div class="sub" id="co"></div></section>
-<section class="two">
-<div class="card"><div class="lbl">Loss limit today</div><div class="big" id="lv"></div><div class="bar"><i id="lb"></i></div><div class="edit"><span>Limit ₹</span><input id="sl" type="number" inputmode="numeric" placeholder="0" onchange="sn('dailyLossLimit',this.value)"></div></div>
-<div class="card"><div class="lbl">Today’s P&amp;L</div><div class="big" id="gv"></div><div class="bar"><i id="gb" style="background:var(--g)"></i></div><div class="edit"><span>Target ₹</span><input id="sg" type="number" inputmode="numeric" placeholder="0" onchange="sn('dailyTarget',this.value)"></div></div>
-</section>
 
-<div class="main">
-<div class="col">
 <section class="card"><h2>Log your day</h2><div class="mode" id="mode"><button type="button" onclick="sm('TRADE')">Trade</button><button type="button" onclick="sm('NOTRADE')">No trade</button><button type="button" onclick="sm('HOLIDAY')">Holiday</button></div>
 <div class="row">
 <div><label>Date</label><input type="date" id="fd"></div>
@@ -47,16 +42,13 @@
 <button class="pri" id="ab" onclick="add()">Add trade</button>
 <div class="sub" id="fmsg" style="margin-top:6px"></div>
 </section>
-<section class="card"><h2>Insights</h2><div class="tiles" id="stats"></div><p class="sub" id="disc" style="margin:12px 0 0"></p></section>
 </div>
-<div class="col">
+<div id="vy" hidden>
 <section class="card"><div class="calhd"><button onclick="mv(-1)" aria-label="Previous month">‹</button><h2 id="calT"></h2><button onclick="mv(1)" aria-label="Next month">›</button></div><div class="cal" id="cal"></div></section>
 <section class="card"><h2>Trades</h2><div id="list"></div></section>
-</div>
-</div>
-
 <footer class="foot"><button onclick="bk()">Copy backup</button><button onclick="rst()">Restore</button></footer>
 <div id="bx" hidden><textarea id="io" rows="4"></textarea></div>
 <div class="sub" id="smsg">Your data is saved in this browser only.</div>
+</div>
 </div>
 <script src="app.js"></script></body></html>
